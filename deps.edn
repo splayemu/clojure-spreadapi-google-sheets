@@ -6,6 +6,10 @@
         cheshire/cheshire {:mvn/version "5.13.0"}}
  :aliases {}
  :paths ["src"]
+ :aliases
+ {:test
+  {:extra-paths ["test"]
+   :main-opts ["-m" "clojure.test" "table.core-test" "table.spreadapi-test"]}}
  :profiles
  {:dev
   {:dependencies []
