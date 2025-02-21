@@ -74,29 +74,3 @@
 
 (defn create-spread-api-google-sheets-client [credentials]
   (map->SpreadAPIGoogleSheets {:credentials credentials}))
-
-
-(comment
-
-
-  (def tm (-> (create-spread-api-google-sheets-client {:script-id "AKfycbw4W8LbxBl-9eWP_2pooXHBiCsezNYsrQLhkxzxhTzNOBfz2noRGFJTwjJgHi0M03y4"
-                                     :key "j5UnmpJ6sr24o8QkMph4FzNOK2nbUjhEmILew11HNiF7zm7rsu#"})
-       (get-sheet "Lift Log") 
-       ))
-
-(-> (create-spread-api-google-sheets-client {:script-id "AKfycbw4W8LbxBl-9eWP_2pooXHBiCsezNYsrQLhkxzxhTzNOBfz2noRGFJTwjJgHi0M03y4"
-                                     :key "j5UnmpJ6sr24o8QkMph4FzNOK2nbUjhEmILew11HNiF7zm7rsu#"})
-    (update-rows "Lift Log" (:data tm))
-       )
-
-(-> (create-google-sheets-client {:script-id "AKfycbw4W8LbxBl-9eWP_2pooXHBiCsezNYsrQLhkxzxhTzNOBfz2noRGFJTwjJgHi0M03y4"
-                                    :key "j5UnmpJ6sr24o8QkMph4FzNOK2nbUjhEmILew11HNiF7zm7rsu#"})
-    (insert-row  "Lift Log" {:Date "2025-02-15T08:00:00.000Z",
-                             :Lift "Bench Press",
-                             :Weight 175,
-                             :Repititions 3,
-                             :Rounds "",
-                             :Scheme ""})
-      )
-
-  )
