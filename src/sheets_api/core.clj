@@ -41,6 +41,11 @@
   (into {} (remove (fn [[k _]] (and (keyword? k) (= "sheets" (namespace k))))
                    m)))
 
+(defn ^:private clean-map
+  "Removes :sheets/ keys from a map."
+  [m]
+  (walk/postwalk #(if (map? %) (remove-sheets-keys %) %) m))
+
 (defn ^:private add-key-to-body
   "Adds the API key to the request body."
   [key body]
@@ -48,17 +53,11 @@
     (mapv #(assoc % :key key) body)
     (assoc body :key key)))
 
-(defn ^:private clean-map
-  "Removes :sheets/ keys from a map."
-  [m]
-  (if (map? m) (remove-sheets-keys m) m))
-
 (defn ^:private replace-id-with-index
   "Replaces :_id with :sheets/index in a map."
   [m]
   (walk/postwalk-replace {:_id :sheets/index} m))
 
-(defn ^:private execute-spreadapi-request
 (defn ^:private execute-spreadapi-request
   "Executes a request against the Spread API, following redirects if necessary."
   [credentials body]
@@ -67,8 +66,8 @@
         api-url (str "https://script.google.com/macros/s/" script-id "/exec")]
     (try
       (let [body (-> body
-                       (add-key-to-body key)
-                       (walk/postwalk clean-map))
+                     (add-key-to-body key)
+                     clean-map)
             response @(http/*http-request* {:method :post
                                             :url api-url
                                             :body (json/encode body)
