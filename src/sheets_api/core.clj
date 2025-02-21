@@ -5,6 +5,11 @@
             [sheets-api.http :as http])
   (:import [java.net URI URLEncoder]))
 
+(defn ^:private fetch-credentials
+  "Fetches credentials, handling both map and function types."
+  [credentials]
+  (if (fn? credentials) (credentials) credentials))
+
 ;;; Protocol definition
 (defprotocol SheetsAPI
   (get-sheet [this sheet-name] "Retrieves data from the specified sheet.")
@@ -21,11 +26,6 @@
   "Fetches credentials, handling both map and function types."
   [credentials]
   (if (fn? credentials) (credentials) credentials))
-
-(defn ^:private redirect?
-  "Checks if the given HTTP status code indicates a redirect."
-  [status]
-  (#{301 302 303 307 308} status))
 
 (defn ^:private execute-redirect
   "Executes a GET request to the redirect URL."
