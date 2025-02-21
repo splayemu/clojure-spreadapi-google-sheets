@@ -17,6 +17,11 @@
   [status]
   (#{301 302 303 307 308} status))
 
+(defn ^:private redirect?
+  "Checks if the given HTTP status code indicates a redirect."
+  [status]
+  (#{301 302 303 307 308} status))
+
 (defn ^:private execute-redirect
   "Executes a GET request to the redirect URL."
   [{:keys [headers]}]
@@ -31,6 +36,23 @@
   (into {} (remove (fn [[k _]] (and (keyword? k) (= "sheets" (namespace k))))
                    m)))
 
+(defn ^:private add-key-to-body
+  "Adds the API key to the request body."
+  [key body]
+  (if (sequential? body)
+    (mapv #(assoc % :key key) body)
+    (assoc body :key key)))
+
+(defn ^:private clean-map
+  "Removes :sheets/ keys from a map."
+  [m]
+  (if (map? m) (remove-sheets-keys m) m))
+
+(defn ^:private replace-id-with-index
+  "Replaces :_id with :sheets/index in a map."
+  [m]
+  (walk/postwalk-replace {:_id :sheets/index} m))
+
 (defn ^:private execute-spreadapi-request
   "Executes a request against the Spread API, following redirects if necessary."
   [credentials body]
@@ -38,10 +60,9 @@
         {:keys [script-id key] :as creds} creds
         api-url (str "https://script.google.com/macros/s/" script-id "/exec")]
     (try
-      (let [body (-> (if (sequential? body)
-                       (mapv #(assoc % :key key) body)
-                       (assoc body :key key))
-                     ((partial walk/postwalk #(if (map? %) (remove-sheets-keys %) %))))
+      (let [body (-> body
+                       (add-key-to-body key)
+                       (walk/postwalk clean-map))
             response @(http/*http-request* {:method :post
                                             :url api-url
                                             :body (json/encode body)
@@ -51,7 +72,7 @@
               response)
             :body
             (json/decode keyword)
-            ((partial walk/postwalk-replace {:_id :sheets/index}))))
+            replace-id-with-index))
       (catch Exception e
         (println (str "An error occurred: " (.getMessage e)))
         e))))
