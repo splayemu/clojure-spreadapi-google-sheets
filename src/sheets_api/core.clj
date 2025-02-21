@@ -1,7 +1,7 @@
 (ns sheets-api.core
-  (:require [clojure.string :as str
-             [clj-http.client :as client]
-             [cheshire.core :as json]]))
+  (:require [clojure.string :as str]
+            [org.httpkit.client :as client]
+            [cheshire.core :as json]))
 
 ;;; Protocol definition
 (defprotocol SheetsAPI
@@ -12,10 +12,9 @@
   (let [{:keys [script-id key] :as creds} credentials
         api-url (str "https://script.google.com/macros/s/" script-id "/exec")]
     (try
-      (let [response (client/post api-url
-                                  {:form-params (assoc params :key key)
-                                   :content-type :json
-                                   :accept :json})
+      (let [response @(client/post api-url
+                                   {:body (json/encode (assoc params :key key))
+                                    :content-type "application/json"})
             body (-> response :body (json/parse-string true))]
         body)
       (catch Exception e
