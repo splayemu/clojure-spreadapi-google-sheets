@@ -17,6 +17,11 @@
   [status]
   (#{301 302 303 307 308} status))
 
+(defn ^:private fetch-credentials
+  "Fetches credentials, handling both map and function types."
+  [credentials]
+  (if (fn? credentials) (credentials) credentials))
+
 (defn ^:private redirect?
   "Checks if the given HTTP status code indicates a redirect."
   [status]
@@ -54,9 +59,10 @@
   (walk/postwalk-replace {:_id :sheets/index} m))
 
 (defn ^:private execute-spreadapi-request
+(defn ^:private execute-spreadapi-request
   "Executes a request against the Spread API, following redirects if necessary."
   [credentials body]
-  (let [creds (if (fn? credentials) (credentials) credentials)
+  (let [creds (fetch-credentials credentials)
         {:keys [script-id key] :as creds} creds
         api-url (str "https://script.google.com/macros/s/" script-id "/exec")]
     (try
@@ -94,5 +100,9 @@
     (let [body {:method "POST" :sheet sheet-name :payload row}]
       (execute-spreadapi-request credentials body))))
 
-(defn create-spread-api-google-sheets-client [credentials]
+(defn create-spread-api-google-sheets-client
+  "Creates a SpreadAPI Google Sheets client.
+  Credentials can be a map containing :script-id and :key,
+  or a function that returns such a map."
+  [credentials]
   (map->SpreadAPIGoogleSheets {:credentials credentials}))
