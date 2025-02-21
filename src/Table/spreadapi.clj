@@ -98,4 +98,4 @@
 
 (defn ->credentials
   [spread-api-google-sheets]
-  (fetch-credentials spread-api-google-sheets))
+  (fetch-credentials (:credentials spread-api-google-sheets)))
