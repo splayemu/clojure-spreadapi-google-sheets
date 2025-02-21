@@ -1,43 +1,36 @@
 (ns sheets-api.core
-  (:require [clojure.string :as str])
-  (:import
-   (com.google.api.client.googleapis.javanet GoogleNetHttpTransport)
-   ;;(com.google.api.client.json.jackson2 JacksonFactory)
-   (com.google.api.services.sheets.v4 Sheets Sheets$Builder)
-   (com.google.api.services.sheets.v4.model ValueRange)))
+  (:require [clojure.string :as str
+             [clj-http.client :as client]
+             [cheshire.core :as json]]))
 
 ;;; Protocol definition
 (defprotocol SheetsAPI
-  (get-sheet [this spreadsheet-id range] "Retrieves data from the specified range in the spreadsheet.")
-  (update-sheet [this spreadsheet-id range values] "Updates data in the specified range in the spreadsheet."))
+  (get-sheet [this sheet-name params] "Retrieves data from the specified sheet.")
+  (update-sheet [this sheet-name params] "Updates data in the specified sheet."))
 
-(defn- execute-sheets-request [credentials f & args]
-  #_(let [transport (GoogleNetHttpTransport/newTrustedTransport)
-        json-factory (JacksonFactory/getDefaultInstance)
-        service (.build (Sheets$Builder. transport json-factory credentials))]
+(defn- execute-spreadapi-request [credentials params]
+  (let [{:keys [script-id key] :as creds} credentials
+        api-url (str "https://script.google.com/macros/s/" script-id "/exec")]
     (try
-      (apply f service args)
+      (let [response (client/post api-url
+                                  {:form-params (assoc params :key key)
+                                   :content-type :json
+                                   :accept :json})
+            body (-> response :body (json/parse-string true))]
+        body)
       (catch Exception e
         (println (str "An error occurred: " (.getMessage e)))
-        nil))))
+        e))))
 
 ;;; Google Sheets API implementation
 (defrecord GoogleSheets [credentials]
   SheetsAPI
-  (get-sheet [this spreadsheet-id range]
-    (execute-sheets-request credentials
-                            (fn [service]
-                              (let [response (.execute (.get (.spreadsheets service) spreadsheet-id range))
-                                    values (.getValues response)]
-                                (if (nil? values)
-                                  []
-                                  (seq values))))))
-  (update-sheet [this spreadsheet-id range values]
-    (execute-sheets-request credentials
-                            (fn [service]
-                              (let [body (doto (ValueRange.) (.setValues (seq values)))
-                                    request (.execute (.update (.values (.spreadsheets service) spreadsheet-id range body) "USER_ENTERED"))]
-                                request)))))
+  (get-sheet [this sheet-name params]
+    (let [default-params {:method "GET" :sheet sheet-name}]
+      (execute-spreadapi-request credentials (merge default-params params))))
+  (update-sheet [this sheet-name params]
+    (let [default-params {:method "PUT" :sheet sheet-name}]
+      (execute-spreadapi-request credentials (merge default-params params)))))
 
 (defn create-google-sheets-client [credentials]
   (GoogleSheets. credentials))
