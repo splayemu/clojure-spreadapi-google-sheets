@@ -2,6 +2,8 @@
   (:require [clojure.test :refer :all]
             [cheshire.core :as json]))
 
+(def redirect-location "https://script.googleusercontent.com/macros/echo?user_content_key=P2YRKE8GZtFuGyI8trGjdGD3chfApW_giFam9E3rygmzpOaL-85KHoaE4pSkfn5ktQ4pciQHGxO8sCAhe3wWQY7r9-ABv4Kpm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnHtl5mwPlvYU42gRyGx9bDeKeeaUSfy-6q9bPUn49Pw7CFILEUQ5CCkmvrZrl0iN6wxh_JTIyLY5PY9K4OxYTVAuQOTXNUegWQ&lib=M1gEZzFjQU-h_Zf89XSMUfp8NR7mQDIq9")
+
 (defn mock-http-response
   [request {:keys [status body headers]}]
   (delay
@@ -16,7 +18,7 @@
    request
    {:status 302
     :body ""
-    :headers {:location "https://script.googleusercontent.com/macros/echo?user_content_key=P2YRKE8GZtFuGyI8trGjdGD3chfApW_giFam9E3rygmzpOaL-85KHoaE4pSkfn5ktQ4pciQHGxO8sCAhe3wWQY7r9-ABv4Kpm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnHtl5mwPlvYU42gRyGx9bDeKeeaUSfy-6q9bPUn49Pw7CFILEUQ5CCkmvrZrl0iN6wxh_JTIyLY5PY9K4OxYTVAuQOTXNUegWQ&lib=M1gEZzFjQU-h_Zf89XSMUfp8NR7mQDIq9"}}))
+    :headers {:location redirect-location}}))
 
 (defn mock-data-response
   [request body]
