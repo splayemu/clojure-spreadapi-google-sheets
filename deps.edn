@@ -3,9 +3,5 @@
         com.google.apis/google-api-services-sheets {:mvn/version "v4-rev20210629-1.32.1"}
         org.slf4j/slf4j-simple {:mvn/version "1.7.32"} ; Add SLF4J simple
         }
- :aliases
- {
-  "run" ["clojure" "-X"]
-  }
- :paths ["src"]
-}
+ :aliases {}
+ :paths ["src"]}

@@ -2,7 +2,7 @@
   (:require [clojure.string :as str])
   (:import
    (com.google.api.client.googleapis.javanet GoogleNetHttpTransport)
-   (com.google.api.client.json.jackson2 JacksonFactory)
+   ;;(com.google.api.client.json.jackson2 JacksonFactory)
    (com.google.api.services.sheets.v4 Sheets Sheets$Builder)
    (com.google.api.services.sheets.v4.model ValueRange)))
 
@@ -12,7 +12,7 @@
   (update-sheet [this spreadsheet-id range values] "Updates data in the specified range in the spreadsheet."))
 
 (defn- execute-sheets-request [credentials f & args]
-  (let [transport (GoogleNetHttpTransport/newTrustedTransport)
+  #_(let [transport (GoogleNetHttpTransport/newTrustedTransport)
         json-factory (JacksonFactory/getDefaultInstance)
         service (.build (Sheets$Builder. transport json-factory credentials))]
     (try
