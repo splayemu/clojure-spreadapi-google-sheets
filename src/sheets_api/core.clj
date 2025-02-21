@@ -5,11 +5,6 @@
             [sheets-api.http :as http])
   (:import [java.net URI URLEncoder]))
 
-(defn ^:private fetch-credentials
-  "Fetches credentials, handling both map and function types."
-  [credentials]
-  (if (fn? credentials) (credentials) credentials))
-
 ;;; Protocol definition
 (defprotocol SheetsAPI
   (get-sheet [this sheet-name] "Retrieves data from the specified sheet.")
