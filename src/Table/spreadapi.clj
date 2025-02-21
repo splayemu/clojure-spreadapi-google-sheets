@@ -73,7 +73,7 @@
 
 ;;; Google Sheets API implementation
 (defrecord SpreadAPIGoogleSheets [credentials]
-  protocol/SheetsAPI
+  protocol/Table
   (get-sheet [this sheet-name]
     (let [body {:method "GET" :sheet sheet-name}]
       (execute-spreadapi-request credentials body)))
