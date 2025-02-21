@@ -1,5 +1,6 @@
 (ns table.test-helpers.http
-  (:require [cheshire.core :as json]))
+  (:require [clojure.test :refer :all]
+            [cheshire.core :as json]))
 
 (defn mock-http-response
   [request {:keys [status body headers]}]
@@ -26,16 +27,20 @@
     :headers {:content-type "application/json; charset=utf-8"}}))
 
 (defn mock-redirect-then-data-response
-  [body]
+  [body redirect-assertions data-assertions]
   (let [calls (atom [])]
     (fn [r]
-      (swap! calls conj)
+      (swap! calls conj r)
       (cond
         (= (count @calls) 1)
-        (mock-redirect-response r)
+        (do
+          (redirect-assertions (update r :body json/decode keyword))
+          (mock-redirect-response r))
 
-        (> (count @calls) 2)
-        (mock-data-response r body)
+        (= (count @calls) 2)
+        (do
+          (data-assertions (update r :body json/decode keyword))
+          (mock-data-response r body))
 
         :else
         (mock-http-response r {:status 500})))))
