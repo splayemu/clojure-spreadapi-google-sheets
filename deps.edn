@@ -9,5 +9,5 @@
  :profiles
  {:dev
   {:dependencies []
-   :source-paths ["dev" "test"]
+   :source-paths ["src" "test"]
    :resource-paths []}}}
