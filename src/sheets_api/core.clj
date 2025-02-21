@@ -29,9 +29,9 @@
 
 (defn ^:private execute-redirect
   "Executes a GET request to the redirect URL."
-  [{:keys [headers]}]
-  (let [redirect-url (get headers "location")
-        redirect-location (str (.resolve (java.net.URI. redirect-url)))]
+  [{:keys [opts headers]}]
+  (let [redirect-url (get headers :location)
+        redirect-location (str (.resolve (java.net.URI. (:url opts)) redirect-url))]
     @(http/*http-request* {:method :get
                            :url redirect-url})))
 
@@ -48,7 +48,7 @@
 
 (defn ^:private add-key-to-body
   "Adds the API key to the request body."
-  [key body]
+  [body key]
   (if (sequential? body)
     (mapv #(assoc % :key key) body)
     (assoc body :key key)))
@@ -69,6 +69,7 @@
                      (add-key-to-body key)
                      clean-map)
             response @(http/*http-request* {:method :post
+                                            :follow-redirects false
                                             :url api-url
                                             :body (json/encode body)
                                             :headers {"content-type" "application/json"}})]
@@ -101,7 +102,7 @@
 
 (defn create-spread-api-google-sheets-client
   "Creates a SpreadAPI Google Sheets client.
-  Credentials can be a map containing :script-id and :key,
-  or a function that returns such a map."
+
+  Credentials can be a map containing :script-id and :key, or a function that returns such a map."
   [credentials]
   (map->SpreadAPIGoogleSheets {:credentials credentials}))
