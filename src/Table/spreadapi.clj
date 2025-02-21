@@ -47,10 +47,6 @@
   [m]
   (walk/postwalk-replace {"_id" :sheets/index} m))
 
-(defn test-shim [a]
-  (def ta a)
-  a)
-
 (defn ^:private execute-spreadapi-request
   "Executes a request against the Spread API, following redirects if necessary."
   [credentials body]
@@ -65,11 +61,9 @@
                                             :url api-url
                                             :body (json/encode body)
                                             :headers {"content-type" "application/json"}})]
-        (def tr response)
         (-> (if (redirect? (:status response))
               (execute-redirect response)
               response)
-            test-shim
             :body
             json/decode
             replace-id-with-index))
