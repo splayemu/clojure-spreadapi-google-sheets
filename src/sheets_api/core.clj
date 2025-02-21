@@ -8,36 +8,36 @@
 
 ;;; Protocol definition
 (defprotocol SheetsAPI
-  (get-data [this spreadsheet-id range] "Retrieves data from the specified range in the spreadsheet.")
-  (update-data [this spreadsheet-id range values] "Updates data in the specified range in the spreadsheet."))
+  (get-sheet [this spreadsheet-id range] "Retrieves data from the specified range in the spreadsheet.")
+  (update-sheet [this spreadsheet-id range values] "Updates data in the specified range in the spreadsheet."))
+
+(defn- execute-sheets-request [credentials f & args]
+  (let [transport (GoogleNetHttpTransport/newTrustedTransport)
+        json-factory (JacksonFactory/getDefaultInstance)
+        service (.build (Sheets$Builder. transport json-factory credentials))]
+    (try
+      (apply f service args)
+      (catch Exception e
+        (println (str "An error occurred: " (.getMessage e)))
+        nil))))
 
 ;;; Google Sheets API implementation
 (defrecord GoogleSheets [credentials]
   SheetsAPI
-  (get-data [this spreadsheet-id range]
-    (let [transport (GoogleNetHttpTransport/newTrustedTransport)
-          json-factory (JacksonFactory/getDefaultInstance)
-          service (.build (Sheets$Builder. transport json-factory credentials))]
-      (try
-        (let [response (.execute (.get (.spreadsheets service) spreadsheet-id range))
-              values (.getValues response)]
-          (if (nil? values)
-            []
-            (seq values)))
-        (catch Exception e
-          (println (str "An error occurred: " (.getMessage e)))
-          nil))))
-  (update-data [this spreadsheet-id range values]
-    (let [transport (GoogleNetHttpTransport/newTrustedTransport)
-          json-factory (JacksonFactory/getDefaultInstance)
-          service (.build (Sheets$Builder. transport json-factory credentials))
-          body (doto (ValueRange.) (.setValues (seq values)))
-          request (.execute (.update (.values (.spreadsheets service) spreadsheet-id range body) "USER_ENTERED")]
-      (try
-        request
-        (catch Exception e
-          (println (str "An error occurred: " (.getMessage e)))
-          nil)))))
+  (get-sheet [this spreadsheet-id range]
+    (execute-sheets-request credentials
+                            (fn [service]
+                              (let [response (.execute (.get (.spreadsheets service) spreadsheet-id range))
+                                    values (.getValues response)]
+                                (if (nil? values)
+                                  []
+                                  (seq values))))))
+  (update-sheet [this spreadsheet-id range values]
+    (execute-sheets-request credentials
+                            (fn [service]
+                              (let [body (doto (ValueRange.) (.setValues (seq values)))
+                                    request (.execute (.update (.values (.spreadsheets service) spreadsheet-id range body) "USER_ENTERED"))]
+                                request)))))
 
 (defn create-google-sheets-client [credentials]
   (GoogleSheets. credentials))
