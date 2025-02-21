@@ -57,7 +57,7 @@ Choose a Google Sheet and follow these [instructions](https://spreadapi.roombelt
 To run the tests, use the following command:
 
 ```shell
-clojure -M:test
+clojure -X:test
 ```
 
 ## License
