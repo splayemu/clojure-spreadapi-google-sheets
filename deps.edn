@@ -3,7 +3,13 @@
         com.google.apis/google-api-services-sheets {:mvn/version "v4-rev20210629-1.32.1"}
         org.slf4j/slf4j-simple {:mvn/version "1.7.32"} ; Add SLF4J simple
         http-kit/http-kit {:mvn/version "2.6.0"}
-        cheshire/cheshire {:mvn/version "5.13.0"}
-        }
+        cheshire/cheshire {:mvn/version "5.13.0"}}
  :aliases {}
- :paths ["src"]}
+ :paths ["src" "test"]
+ :profiles
+ {:dev
+  {:dependencies [[org.clojure/test.check {:mvn/version "1.1.1"}]]
+   :source-paths ["dev"]
+   :resource-paths ["test-resources"]
+   :repl-options {:init-ns sheets-api.core}}}
+}
