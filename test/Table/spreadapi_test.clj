@@ -28,17 +28,31 @@
                                                    :key test-key}})]
       (binding [http/*http-request*
                 (test-helpers.http/mock-redirect-then-data-response
-                 {"_id" 1
-                  "Derp meow" "hehe"}
+                 {"status" 200
+                  "data" {"_id" 1
+                          "Derp meow" "hehe"}}
                  (redirect-assertions {:method "GET" :sheet table-name :key test-key})
                  data-assertions)]
         (let [response (table.protocol/get-sheet spread-api-google-sheets table-name)]
-          (is (= {:sheets/index 1
-                  "Derp meow" "hehe"}
+          (is (= {"status" 200
+                  "data" {:sheets/index 1
+                          "Derp meow" "hehe"}}
                  response)))))))
 
 (deftest update-row-test
-  (testing ""))
+  (testing "update a row in a sheet"
+    (let [index 5
+          row {"column1" "new value" "column2" "another value"}
+          spread-api-google-sheets (table.spreadapi/map->SpreadAPIGoogleSheets
+                                    {:credentials {:script-id script-id
+                                                   :key test-key}})]
+      (binding [http/*http-request*
+                (test-helpers.http/mock-redirect-then-data-response
+                 {"status" 201}
+                 (redirect-assertions {:method "PUT" :sheet table-name :id index :payload row :key test-key})
+                 data-assertions)]
+        (let [response (table.protocol/update-row spread-api-google-sheets table-name index row)]
+          (is (= {"status" 201} response)))))))
 
 (deftest update-rows-test
   (testing ""))

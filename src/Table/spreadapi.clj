@@ -77,6 +77,7 @@
   (get-sheet [this table-name]
     (let [body {:method "GET" :sheet table-name}]
       (execute-spreadapi-request credentials body)))
+  ;; Note that this won't update any attributes that don't exist as columns already
   (update-row [this table-name index row]
     (let [body {:method "PUT" :sheet table-name :id index :payload row}]
       (execute-spreadapi-request credentials body)))
