@@ -95,3 +95,7 @@
   Credentials can be a map containing :script-id and :key, or a function that returns such a map."
   [credentials]
   (map->SpreadAPIGoogleSheets {:credentials credentials}))
+
+(defn ->credentials
+  [spread-api-google-sheets]
+  (fetch-credentials spread-api-google-sheets))

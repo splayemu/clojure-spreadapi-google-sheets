@@ -84,3 +84,18 @@
                  data-assertions)]
         (let [response (table.protocol/insert-row spread-api-google-sheets table-name row)]
           (is (= {"status" 201} response)))))))
+
+(deftest credentials-test
+  (testing "static credentials are fetched"
+    (let [spread-api-google-sheets (table.spreadapi/map->SpreadAPIGoogleSheets
+                                    {:credentials {:script-id script-id
+                                                   :key test-key}})]
+      (is (= (table.spreadapi/->credentials spread-api-google-sheets)
+             {:script-id script-id :key test-key}))))
+
+  (testing "fn credentials are fetched"
+    (let [spread-api-google-sheets (table.spreadapi/map->SpreadAPIGoogleSheets
+                                    {:credentials (fn [] {:script-id script-id
+                                                          :key test-key})})]
+      (is (= (table.spreadapi/->credentials spread-api-google-sheets)
+             {:script-id script-id :key test-key})))))
