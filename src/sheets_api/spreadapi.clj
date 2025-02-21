@@ -50,8 +50,7 @@
 (defn ^:private execute-spreadapi-request
   "Executes a request against the Spread API, following redirects if necessary."
   [credentials body]
-  (let [creds (fetch-credentials credentials)
-        {:keys [script-id key] :as creds} creds
+  (let [{:keys [script-id key]} (fetch-credentials credentials)
         api-url (str "https://script.google.com/macros/s/" script-id "/exec")]
     (try
       (let [body (-> body
