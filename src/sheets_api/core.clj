@@ -22,8 +22,8 @@
   [{:keys [headers]}]
   (let [redirect-url (get headers "location")
         redirect-location (str (.resolve (java.net.URI. redirect-url)))]
-    @(http/request {:method :get
-                    :url redirect-url})))
+    @(http/*http-request* {:method :get
+                           :url redirect-url})))
 
 (defn ^:private remove-sheets-keys
   "Removes keywords like :sheets/index."
@@ -41,10 +41,10 @@
                        (mapv #(assoc % :key key) body)
                        (assoc body :key key))
                      ((partial walk/postwalk #(if (map? %) (remove-sheets-keys %) %))))
-            response @(http/http-request {:method :post
-                                     :url api-url
-                                     :body (json/encode body)
-                                     :headers {"content-type" "application/json"}})]
+            response @(http/*http-request* {:method :post
+                                            :url api-url
+                                            :body (json/encode body)
+                                            :headers {"content-type" "application/json"}})]
         (-> (if (redirect? (:status response))
               (execute-redirect response)
               response)

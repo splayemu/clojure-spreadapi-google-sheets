@@ -1,4 +1,4 @@
 (ns sheets-api.http
-  (:require [org.httpkit.client :as http]))
+  (:require [org.httpkit.client :as http-client]))
 
-(def ^:dynamic http-request http/request)
+(def ^:dynamic *http-request* http-client/request)
