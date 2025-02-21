@@ -7,16 +7,16 @@
   (require '[table.spreadapi])
 
   (def credentials
-    {:script-id "AKfycbw4W8LbxBl-9eWP_2pooXHBiCsezNYsrQLhkxzxhTzNOBfz2noRGFJTwjJgHi0M03y4"
-     :key "j5UnmpJ6sr24o8QkMph4FzNOK2nbUjhEmILew11HNiF7zm7rsu#"})
+    {:script-id "script-id"
+     :key "key"})
 
-  (def tm
+  (def table
     (-> (table.spreadapi/create-spread-api-google-sheets-client credentials)
         (table.protocol/get-sheet "Lift Log")
         ))
 
   (-> (table.spreadapi/create-spread-api-google-sheets-client credentials)
-      (table.protocol/update-rows "Lift Log" (get tm "data")))
+      (table.protocol/update-rows "Lift Log" (get table "data")))
 
 (-> (table.spreadapi/create-spread-api-google-sheets-client credentials)
       (table.protocol/update-row "Lift Log" 10 {"Lift" 1}))
