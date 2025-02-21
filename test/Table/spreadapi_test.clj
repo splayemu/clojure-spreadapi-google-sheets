@@ -72,4 +72,15 @@
                   {"status" 201}] response)))))))
 
 (deftest insert-row-test
-  (testing ""))
+  (testing "insert a row in a sheet"
+    (let [row {"column1" "new value" "column2" "another value"}
+          spread-api-google-sheets (table.spreadapi/map->SpreadAPIGoogleSheets
+                                    {:credentials {:script-id script-id
+                                                   :key test-key}})]
+      (binding [http/*http-request*
+                (test-helpers.http/mock-redirect-then-data-response
+                 {"status" 201}
+                 (redirect-assertions {:method "POST" :sheet table-name :payload row :key test-key})
+                 data-assertions)]
+        (let [response (table.protocol/insert-row spread-api-google-sheets table-name row)]
+          (is (= {"status" 201} response)))))))
