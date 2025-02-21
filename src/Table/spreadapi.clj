@@ -45,7 +45,11 @@
 (defn ^:private replace-id-with-index
   "Replaces :_id with :sheets/index in a map."
   [m]
-  (walk/postwalk-replace {:_id :sheets/index} m))
+  (walk/postwalk-replace {"_id" :sheets/index} m))
+
+(defn test-shim [a]
+  (def ta a)
+  a)
 
 (defn ^:private execute-spreadapi-request
   "Executes a request against the Spread API, following redirects if necessary."
@@ -61,11 +65,13 @@
                                             :url api-url
                                             :body (json/encode body)
                                             :headers {"content-type" "application/json"}})]
+        (def tr response)
         (-> (if (redirect? (:status response))
               (execute-redirect response)
               response)
+            test-shim
             :body
-            (json/decode keyword)
+            json/decode
             replace-id-with-index))
       (catch Exception e
         (println (str "An error occurred: " (.getMessage e)))
@@ -74,18 +80,18 @@
 ;;; Google Sheets API implementation
 (defrecord SpreadAPIGoogleSheets [credentials]
   protocol/Table
-  (get-sheet [this sheet-name]
-    (let [body {:method "GET" :sheet sheet-name}]
+  (get-sheet [this table-name]
+    (let [body {:method "GET" :sheet table-name}]
       (execute-spreadapi-request credentials body)))
-  (update-row [this sheet-name index row]
-    (let [body {:method "PUT" :sheet sheet-name :id index :payload row}]
+  (update-row [this table-name index row]
+    (let [body {:method "PUT" :sheet table-name :id index :payload row}]
       (execute-spreadapi-request credentials body)))
-  (update-rows [this sheet-name rows]
+  (update-rows [this table-name rows]
     (let [body (vec (for [{:sheets/keys [index] :as row} rows]
-                      {:method "PUT" :sheet sheet-name :id index :payload row}))]
+                      {:method "PUT" :sheet table-name :id index :payload row}))]
       (execute-spreadapi-request credentials body)))
-  (insert-row [this sheet-name row]
-    (let [body {:method "POST" :sheet sheet-name :payload row}]
+  (insert-row [this table-name row]
+    (let [body {:method "POST" :sheet table-name :payload row}]
       (execute-spreadapi-request credentials body))))
 
 (defn create-spread-api-google-sheets-client
