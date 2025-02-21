@@ -1,9 +1,9 @@
-(ns sheets-api.spreadapi
+(ns Table.spreadapi
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [cheshire.core :as json]
-            [sheets-api.http :as http]
-            [sheets-api.protocol :as protocol])
+            [Table.http :as http]
+            [Table.protocol :as protocol])
   (:import [java.net URI URLEncoder]))
 
 (defn ^:private redirect? 

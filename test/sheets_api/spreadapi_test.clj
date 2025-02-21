@@ -1,6 +1,6 @@
-(ns sheets-api.spreadapi-test
+(ns Table.spreadapi-test
   (:require [clojure.test :refer :all]
-            [sheets-api.spreadapi :as spreadapi]))
+            [Table.spreadapi :as spreadapi]))
 
 (deftest get-sheet-test
   (testing ""))

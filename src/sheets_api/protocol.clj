@@ -1,4 +1,4 @@
-(ns sheets-api.protocol)
+(ns Table.protocol)
 
 (defprotocol SheetsAPI
   (get-sheet [this sheet-name] "Retrieves data from the specified sheet.")
