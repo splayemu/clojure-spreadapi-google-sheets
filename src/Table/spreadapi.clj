@@ -1,9 +1,9 @@
-(ns Table.spreadapi
+(ns table.spreadapi
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [cheshire.core :as json]
-            [Table.http :as http]
-            [Table.protocol :as protocol])
+            [table.http :as http]
+            [table.protocol :as protocol])
   (:import [java.net URI URLEncoder]))
 
 (defn ^:private redirect? 
