@@ -55,7 +55,21 @@
           (is (= {"status" 201} response)))))))
 
 (deftest update-rows-test
-  (testing ""))
+  (testing "update multiple rows in a sheet"
+    (let [rows [{:sheets/index 5 "column1" "new value" "column2" "another value"}
+                {:sheets/index 6 "column1" "yet another value" "column2" "and another"}]
+          spread-api-google-sheets (table.spreadapi/map->SpreadAPIGoogleSheets
+                                    {:credentials {:script-id script-id
+                                                   :key test-key}})]
+      (binding [http/*http-request*
+                (test-helpers.http/mock-redirect-then-data-response
+                 [{"status" 201}
+                  {"status" 201}]
+                 (redirect-assertions {:method "PUT" :sheet table-name :key test-key :payload (mapv #(dissoc % :sheets/index) rows)})
+                 data-assertions)]
+        (let [response (table.protocol/update-rows spread-api-google-sheets table-name rows)]
+          (is (= [{"status" 201}
+                  {"status" 201}] response)))))))
 
 (deftest insert-row-test
   (testing ""))
