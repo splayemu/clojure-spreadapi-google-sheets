@@ -1,8 +1,8 @@
 (ns sheets-api.core
   (:require [clojure.string :as str]
-            [org.httpkit.client :as http]
             [clojure.walk :as walk]
-            [cheshire.core :as json])
+            [cheshire.core :as json]
+            [sheets-api.http :as http])
   (:import [java.net URI URLEncoder]))
 
 ;;; Protocol definition
@@ -41,7 +41,7 @@
                        (mapv #(assoc % :key key) body)
                        (assoc body :key key))
                      ((partial walk/postwalk #(if (map? %) (remove-sheets-keys %) %))))
-            response @(http/request {:method :post
+            response @(http/http-request {:method :post
                                      :url api-url
                                      :body (json/encode body)
                                      :headers {"content-type" "application/json"}})]
