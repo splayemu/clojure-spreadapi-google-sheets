@@ -1,16 +1,10 @@
-(ns sheets-api.core
+(ns sheets-api.spreadapi
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [cheshire.core :as json]
-            [sheets-api.http :as http])
+            [sheets-api.http :as http]
+            [sheets-api.protocol :as protocol])
   (:import [java.net URI URLEncoder]))
-
-;;; Protocol definition
-(defprotocol SheetsAPI
-  (get-sheet [this sheet-name] "Retrieves data from the specified sheet.")
-  (update-row [this sheet-name index row] "Updates row in the specified sheet.")
-  (update-rows [this sheet-name rows] "Updates rows in the specified sheet.")
-  (insert-row [this sheet-name row] "Inserts a new row at end of sheet."))
 
 (defn ^:private redirect? 
   "Checks if the given HTTP status code indicates a redirect."
@@ -80,7 +74,7 @@
 
 ;;; Google Sheets API implementation
 (defrecord SpreadAPIGoogleSheets [credentials]
-  SheetsAPI
+  protocol/SheetsAPI
   (get-sheet [this sheet-name]
     (let [body {:method "GET" :sheet sheet-name}]
       (execute-spreadapi-request credentials body)))
