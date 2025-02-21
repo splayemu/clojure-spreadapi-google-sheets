@@ -2,6 +2,7 @@
         com.google.api-client/google-api-client {:mvn/version "1.33.0"}
         com.google.apis/google-api-services-sheets {:mvn/version "v4-rev20210629-1.32.1"}
         org.slf4j/slf4j-simple {:mvn/version "1.7.32"} ; Add SLF4J simple
+        clj-http/clj-http {:mvn/version "3.12.1"}
         }
  :aliases {}
  :paths ["src"]}
